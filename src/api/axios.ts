@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { Domain } from '../domains/domainTypes';
-import { User } from '../domains/userTypes';
-import { Account } from "../domains/accountTypes";
+import { Domain } from '../types/domainTypes';
+import { User } from '../types/userTypes';
+import { Account } from "../types/accountTypes";
 
 
 // Instância base do Axios

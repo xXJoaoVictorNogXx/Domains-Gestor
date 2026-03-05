@@ -22,9 +22,7 @@ export default function Header() {
         <Link href={"/accounts"} className="hover:text-blue-700 font-medium">
           Contas
         </Link>
-        <Link href={"/Overview"} className="hover:text-blue-700 font-medium">
-          candidaturas
-        </Link>
+
         <Button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className="w-9 h-9 p-2"

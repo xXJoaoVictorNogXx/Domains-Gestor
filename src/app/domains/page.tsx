@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/src/components/ui/card";
 import { Switch } from "@/src/components/ui/switch"; // Certifique-se de ter instalado: npx shadcn@latest add switch
-import { Domain } from "@/src/domains/domainTypes";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
@@ -76,7 +75,7 @@ export default function Domains() {
 
               <CardFooter className="pt-2">
                 <Button asChild className="w-full" variant="outline">
-                  <Link href={`/accounts?domainId=${domain.id}`}>
+                  <Link href={`/domains/${domain.id}`}>
                     Ver Contas Cadastradas
                   </Link>
                 </Button>

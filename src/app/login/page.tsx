@@ -1,6 +1,4 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { getAccount } from "@/src/api/axios";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";

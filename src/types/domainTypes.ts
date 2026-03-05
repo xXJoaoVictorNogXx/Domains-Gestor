@@ -5,3 +5,8 @@ export interface Domain {
     isBlocked: boolean;
     description?: string;
 }
+
+export interface GetDomainsParams {
+    id?: string | null;
+    name?: string;
+}

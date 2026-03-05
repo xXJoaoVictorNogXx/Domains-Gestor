@@ -5,3 +5,9 @@ export interface Account {
   isBlocked: boolean;
   domainId: string;
 }
+
+export interface ChangePasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  accountId: string | null;
+}
