@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { ChangePasswordModalProps } from "@/src/types/accountTypes";
 import { passwordSchema } from "@/src/schemas/modalSchema";
+import { ZodError } from "zod";
 
 export function ChangePasswordModal({
   isOpen,
@@ -21,9 +22,13 @@ export function ChangePasswordModal({
     setError(null);
 
     const validation = passwordSchema.safeParse({ password, confirmPassword });
+    const zodError = validation.success ? null : (validation.error as ZodError);
 
     if (!validation.success) {
-      setError(validation.error.errors[0].message);
+      setError(
+        zodError?.issues?.[0]?.message ||
+          "Dados inválidos. Verifique os campos e tente novamente.",
+      );
       return;
     }
 

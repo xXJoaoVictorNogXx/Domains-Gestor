@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +11,11 @@ import { ChangePasswordModal } from "@/src/components/ModalChangePassword";
 export default function DomainAccounts() {
   const params = useParams();
   const domainId = params.id;
+
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
+    null,
+  );
 
   const accounts = useQuery({
     queryKey: ["accounts"],
@@ -39,11 +43,6 @@ export default function DomainAccounts() {
 
   const dominioAtual = domains.data?.find(
     (d) => String(d.id) === String(domainId),
-  );
-
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
-    null,
   );
 
   return (

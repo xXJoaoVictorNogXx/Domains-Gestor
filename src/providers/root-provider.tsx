@@ -9,7 +9,7 @@ export default function RootProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const autorizedPages = ["/login"];
+  const autorizedPages = ["/login", "/", "/register"];
   const isAutorized = autorizedPages.includes(pathname);
 
   return (

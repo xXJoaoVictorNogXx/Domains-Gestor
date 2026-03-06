@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { Switch } from "@/src/components/ui/switch"; // Certifique-se de ter instalado: npx shadcn@latest add switch
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
@@ -30,10 +29,11 @@ export default function Domains() {
       </div>
     );
   }
-  if (domains?.data?.error) {
+  if (domains?.isError) {
     return (
       <div className="flex h-screen items-center justify-center text-destructive">
-        Erro: {domains.data.error}
+        Erro:
+        {domains.error?.message || "Não foi possível carregar os domínios."}
       </div>
     );
   }
@@ -67,11 +67,6 @@ export default function Domains() {
                   {domain.description || "Sem descrição disponível"}
                 </CardDescription>
               </CardHeader>
-
-              <CardContent className="flex items-center justify-between py-4">
-                <span className="text-sm font-medium">Bloquear Acesso</span>
-                <Switch />
-              </CardContent>
 
               <CardFooter className="pt-2">
                 <Button asChild className="w-full" variant="outline">
