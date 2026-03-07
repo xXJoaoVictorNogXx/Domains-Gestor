@@ -11,3 +11,14 @@ export interface ChangePasswordModalProps {
   onClose: () => void;
   accountId: string | null;
 }
+
+export interface CreateAccountModalProps {
+  isOpen: boolean;
+  isLoading: boolean;
+  onClose: () => void;
+  onSubmit: (data: {
+    email: string;
+    password: string;
+    storage: number;
+  }) => void;
+}

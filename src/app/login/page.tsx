@@ -7,7 +7,6 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "@/src/api/axios";
-
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
@@ -20,24 +19,17 @@ import {
 } from "@/src/components/ui/field";
 
 export default function Login() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      const token =
-        data.accessToken || data.user.token || data.user.accessToken;
+      localStorage.setItem("meu_token", data.accessToken);
 
-      if (token) {
-        localStorage.setItem("fake-jwt-token", token);
-      }
-      console.log("Resposta do login:", data);
       toast.success("Login realizado com sucesso!");
 
-      router.push("/domains");
+      window.location.replace("/domains");
     },
     onError: (error) => {
       console.error("Erro no login:", error);

@@ -1,179 +1,209 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getAccount, getDomains } from "@/src/api/axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  getAccount,
+  getDomains,
+  deleteDomainAccount,
+  updateDomainAccount,
+} from "@/src/api/axios";
 import { useParams } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Switch } from "@/src/components/ui/switch";
 import { useState } from "react";
 import { ChangePasswordModal } from "@/src/components/ModalChangePassword";
+import { CreateAccountModal } from "@/src/components/ModalAccountDomain";
+import { ProtectedRoute } from "@/src/components/protectedRoutes";
+import { toast } from "sonner";
+import Link from "next/link";
 
 export default function DomainAccounts() {
   const params = useParams();
   const domainId = params.id;
+  const queryClient = useQueryClient();
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
     null,
   );
 
-  const accounts = useQuery({
-    queryKey: ["accounts"],
-    queryFn: async () => {
-      const data = await getAccount();
-      return data;
+  const accounts = useQuery({ queryKey: ["accounts"], queryFn: getAccount });
+  const domains = useQuery({ queryKey: ["domains"], queryFn: getDomains });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteDomainAccount,
+    onSuccess: () => {
+      toast.success("Conta removida com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
     },
   });
 
-  const domains = useQuery({
-    queryKey: ["domains"],
-    queryFn: async () => {
-      const data = await getDomains();
-      return data;
+  const updateMutation = useMutation({
+    mutationFn: updateDomainAccount,
+    onSuccess: () => {
+      toast.success("Conta atualizada!");
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
     },
   });
 
   if (accounts.isPending || domains.isPending) {
-    return <div className="p-10">Carregando contas deste domínio...</div>;
+    return (
+      <div className="p-10 text-center text-slate-500">
+        Carregando contas...
+      </div>
+    );
   }
-  const contasDoDominio =
-    accounts.data?.filter(
-      (account) => String(account.domainId) === String(domainId),
-    ) || [];
 
+  const contasDoDominio =
+    accounts.data?.filter((a) => String(a.domainId) === String(domainId)) || [];
   const dominioAtual = domains.data?.find(
     (d) => String(d.id) === String(domainId),
   );
 
   return (
-    <main className="flex flex-col gap-6 items-center min-h-screen bg-secondary py-10">
-      <div className="w-full max-w-6xl px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">
-            Contas vinculadas: {dominioAtual?.name || `Domínio ${domainId}`}
-          </h1>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow w-full">
-          {contasDoDominio.length > 0 ? (
-            <ul className="flex flex-col gap-4">
-              {contasDoDominio.map((account) => (
-                <li
-                  key={account.id}
-                  className="border border-slate-200 p-5 rounded-lg flex flex-col gap-5 bg-slate-50/50 hover:bg-slate-50 transition-colors"
-                >
-                  {/* CABEÇALHO DO CARD DA CONTA */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-                    <div>
-                      <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-                        ID da Conta
-                      </span>
-                      <p className="font-mono text-lg font-medium text-slate-800">
-                        {account.id}
-                      </p>
-                    </div>
+    <ProtectedRoute>
+      <main className="flex flex-col gap-6 items-center min-h-screen bg-secondary py-10">
+        <div className="w-full max-w-6xl px-4">
+          <div className="mb-8 flex justify-between items-center">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/domains">&larr; Voltar para Domínios</Link>
+            </Button>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Contas: {dominioAtual?.name || `Domínio ${domainId}`}
+            </h1>
+            <Button onClick={() => setIsCreateModalOpen(true)}>
+              + Nova Conta
+            </Button>
+          </div>
 
-                    {/* ❌ REMOVER CONTA */}
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => {
-                        // Confirmação nativa rápida e fácil para entregar no sábado!
-                        const confirmou = window.confirm(
-                          "Tem certeza que deseja remover esta conta? Esta ação não pode ser desfeita.",
-                        );
-                        if (confirmou) {
-                          console.log(
-                            "TODO: Chamar mutation de exclusão e invalidar query",
-                            account.id,
-                          );
-                        }
-                      }}
-                    >
-                      ❌ Remover Conta
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                    <div className="flex flex-col gap-3">
-                      <span className="text-sm font-semibold text-slate-700">
-                        Status de Acesso
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {/* No seu Switch, você vai plugar o onCheckedChange chamando a mutation */}
-                        <Switch
-                          // checked={account.isBlocked} <-- Você vai usar o dado real aqui
-                          onCheckedChange={(checked) => {
-                            console.log(
-                              "TODO: Mutation para alterar status",
-                              checked,
-                            );
-                          }}
-                        />
-                        <span className="text-sm text-muted-foreground">
-                          Bloquear / Desbloquear
+          <div className="bg-white p-6 rounded-lg shadow w-full">
+            {contasDoDominio.length > 0 ? (
+              <ul className="flex flex-col gap-4">
+                {contasDoDominio.map((account) => (
+                  <li
+                    key={account.id}
+                    className="border border-slate-200 p-5 rounded-lg flex flex-col gap-5 bg-slate-50/50"
+                  >
+                    <div className="flex justify-between items-center border-b pb-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground uppercase font-bold">
+                          E-mail
                         </span>
+                        <p className="font-mono text-lg font-medium">
+                          {account.email}
+                        </p>
                       </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={deleteMutation.isPending}
+                        onClick={() => {
+                          if (
+                            toast.warning("Deseja mesmo remover esta conta?")
+                          ) {
+                            deleteMutation.mutate(account.id);
+                          }
+                        }}
+                      >
+                        ❌ Remover
+                      </Button>
                     </div>
 
-                    <div className="flex flex-col gap-3">
-                      <span className="text-sm font-semibold text-slate-700">
-                        Limite de Storage (GB)
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {/* Se não tiver o componente Input do shadcn, use uma tag <input> normal do HTML com as mesmas classes */}
-                        <input
-                          type="number"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 max-w-[100px]"
-                          defaultValue={account.storage || 10}
-                          // onChange={(e) => setNovoStorage(e.target.value)} <-- Sugestão para pegar o valor
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                      <div className="flex flex-col gap-3">
+                        <span className="text-sm font-semibold">
+                          Status de Acesso
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={account.isBlocked}
+                            disabled={updateMutation.isPending}
+                            onCheckedChange={(checked) => {
+                              updateMutation.mutate({
+                                id: account.id,
+                                data: { isBlocked: checked },
+                              });
+                            }}
+                          />
+                          <span className="text-sm text-muted-foreground">
+                            {account.isBlocked ? "Bloqueada" : "Ativa"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <span className="text-sm font-semibold">
+                          Storage (GB)
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            id={`storage-${account.id}`}
+                            type="number"
+                            defaultValue={account.storage || 10}
+                            className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm max-w-25"
+                          />
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            disabled={updateMutation.isPending}
+                            onClick={() => {
+                              const inputElement = document.getElementById(
+                                `storage-${account.id}`,
+                              ) as HTMLInputElement;
+                              updateMutation.mutate({
+                                id: account.id,
+                                data: { storage: Number(inputElement.value) },
+                              });
+                            }}
+                          >
+                            💾 Salvar
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <span className="text-sm font-semibold">Segurança</span>
                         <Button
-                          variant="secondary"
-                          size="sm"
+                          variant="outline"
                           onClick={() => {
-                            console.log(
-                              "TODO: Mutation para salvar novo storage",
-                            );
+                            setSelectedAccountId(account.id);
+                            setIsPasswordModalOpen(true);
                           }}
                         >
-                          💾 Salvar
+                          🔑 Alterar Senha
                         </Button>
                       </div>
                     </div>
-
-                    <div className="flex flex-col gap-3">
-                      <span className="text-sm font-semibold text-slate-700">
-                        Segurança
-                      </span>
-                      <Button
-                        variant="outline"
-                        className="w-full sm:w-auto"
-                        onClick={() => {
-                          setSelectedAccountId(account.id);
-                          setIsPasswordModalOpen(true);
-                        }}
-                      >
-                        🔑 Alterar Senha
-                      </Button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Nenhuma conta encontrada para este domínio.</p>
-            </div>
-          )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                Nenhuma conta encontrada.
+              </p>
+            )}
+          </div>
         </div>
-      </div>
-      <ChangePasswordModal
-        isOpen={isPasswordModalOpen}
-        accountId={selectedAccountId}
-        onClose={() => {
-          setIsPasswordModalOpen(false);
-          setSelectedAccountId(null);
-        }}
-      />
-    </main>
+
+        <ChangePasswordModal
+          isOpen={isPasswordModalOpen}
+          accountId={selectedAccountId}
+          onClose={() => {
+            setIsPasswordModalOpen(false);
+            setSelectedAccountId(null);
+          }}
+        />
+        <CreateAccountModal
+          isOpen={isCreateModalOpen}
+          isLoading={false}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={(data) =>
+            toast.success("Conta criada com sucesso!") ||
+            queryClient.invalidateQueries({ queryKey: ["accounts"] })
+          }
+        />
+      </main>
+    </ProtectedRoute>
   );
 }

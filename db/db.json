@@ -58,7 +58,7 @@
     {
       "id": "1",
       "email": "financeiro@empresa.com",
-      "storage": 10240,
+      "storage": 1000,
       "isBlocked": false,
       "domainId": "1"
     },
@@ -66,7 +66,7 @@
       "id": "4",
       "email": "rh@empresa.com",
       "storage": 15360,
-      "isBlocked": false,
+      "isBlocked": true,
       "domainId": "1"
     },
     {
@@ -74,7 +74,8 @@
       "email": "diretoria@empresa.com",
       "storage": 102400,
       "isBlocked": false,
-      "domainId": "1"
+      "domainId": "1",
+      "password": "123456"
     },
     {
       "id": "2",

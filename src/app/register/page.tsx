@@ -9,6 +9,7 @@ import { registerSchema } from "@/src/schemas/registerSchema";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 import { useMutation } from "@tanstack/react-query";
+import { ProtectedRoute } from "@/src/components/protectedRoutes";
 
 export default function Register() {
   const registerMutation = useMutation({

@@ -2,7 +2,6 @@ import axios from 'axios';
 import { Domain } from '../types/domainTypes';
 import { User } from '../types/userTypes';
 import { Account } from "../types/accountTypes";
-import { LoginResponse } from '../types/userTypes';
 
 // Instância base do Axios
 export const axiosInstance = axios.create({
@@ -14,6 +13,27 @@ export const axiosInstance = axios.create({
 })
 
 
+// Parte de contas do domínio
+export const createDomainAccount = async (accountData: Omit<Account, 'id'>) => {
+  try {
+    const response = await axiosInstance.post<Account>('/accounts', accountData);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar conta no domínio:", error);
+    throw error;
+  }
+};
+
+export const deleteDomainAccount = async (id: string) => {
+  await axiosInstance.delete(`/accounts/${id}`);
+};
+
+export const updateDomainAccount = async ({ id, data }: { id: string; data: any }) => {
+  const response = await axiosInstance.patch(`/accounts/${id}`, data);
+  return response.data;
+};
+
+//Parte de acessos e criação de usuários do sistema em si
 export const loginUser = async (credentials: { email: User['email']; password: User['password'] }) => {
   try {
     const usersResponse = await axiosInstance.get(`/users?email=${credentials.email}`);
@@ -64,7 +84,7 @@ axiosInstance.interceptors.request.use(
         console.error('Erro na montagem da requisição:', err);
         return Promise.reject(err);
     }
-)
+) 
 
 export const createAccount = async (userData: { name: string; email: User['email']; password: User['password'] }) => {
   const response = await axiosInstance.post<User[]>('/users', userData); 
@@ -82,4 +102,3 @@ export const getDomains = async () => {
     const response = await axiosInstance.get<Domain[]>('/domains');
     return response.data
 }
-
