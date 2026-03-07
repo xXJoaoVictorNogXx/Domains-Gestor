@@ -3,12 +3,13 @@ import { db } from "@/src/lib/db";
 
 export async function PATCH(
   request: Request, 
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } 
 ) {
   try {
+    const { id } = await params; 
     const body = await request.json();
     
-    const index = db.accounts.findIndex((a) => String(a.id) === String(params.id));
+    const index = db.accounts.findIndex((a) => String(a.id) === String(id));
 
     if (index === -1) {
       return NextResponse.json({ error: "Conta não encontrada" }, { status: 404 });
@@ -24,10 +25,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request, 
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const index = db.accounts.findIndex((a) => String(a.id) === String(params.id));
+    const { id } = await params;
+    const index = db.accounts.findIndex((a) => String(a.id) === String(id));
 
     if (index === -1) {
       return NextResponse.json({ error: "Conta não encontrada" }, { status: 404 });
