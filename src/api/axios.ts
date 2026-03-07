@@ -5,7 +5,7 @@ import { Account } from "../types/accountTypes";
 
 // Instância base do Axios
 export const axiosInstance = axios.create({
-    baseURL: 'http://localhost:3001',
+    baseURL: 'https://meu-backend-qle5.onrender.com', // em caso de teste local utilizar http://localhost:3001
     headers: {
         'Content-Type': 'application/json',
     },
