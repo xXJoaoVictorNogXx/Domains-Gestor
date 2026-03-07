@@ -5,7 +5,7 @@ import { Account } from "../types/accountTypes";
 
 // Instância base do Axios
 export const axiosInstance = axios.create({
-        baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',    
+  baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001',
         headers: {
         'Content-Type': 'application/json',
     },
