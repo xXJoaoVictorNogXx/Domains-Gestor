@@ -6,6 +6,7 @@ import {
   getDomains,
   deleteDomainAccount,
   updateDomainAccount,
+  createDomainAccount,
 } from "@/src/api/axios";
 import { useParams } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
@@ -16,6 +17,7 @@ import { CreateAccountModal } from "@/src/components/ModalAccountDomain";
 import { ProtectedRoute } from "@/src/components/protectedRoutes";
 import { toast } from "sonner";
 import Link from "next/link";
+import { CreateAccountFormData } from "@/src/types/accountTypes";
 
 export default function DomainAccounts() {
   const params = useParams();
@@ -30,6 +32,25 @@ export default function DomainAccounts() {
 
   const accounts = useQuery({ queryKey: ["accounts"], queryFn: getAccount });
   const domains = useQuery({ queryKey: ["domains"], queryFn: getDomains });
+
+  const createAccountMutation = useMutation({
+    mutationFn: (
+      newAccount: CreateAccountFormData & {
+        domainId: string;
+        isBlocked: boolean;
+      },
+    ) => createDomainAccount(newAccount),
+
+    onSuccess: () => {
+      toast.success("Conta criada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      setIsCreateModalOpen(false);
+    },
+    onError: (error: Error) => {
+      console.error("Erro ao criar conta:", error.message);
+      toast.error("Erro ao criar conta no servidor.");
+    },
+  });
 
   const deleteMutation = useMutation({
     mutationFn: deleteDomainAccount,
@@ -99,9 +120,7 @@ export default function DomainAccounts() {
                         size="sm"
                         disabled={deleteMutation.isPending}
                         onClick={() => {
-                          if (
-                            toast.warning("Deseja mesmo remover esta conta?")
-                          ) {
+                          if (confirm("Deseja mesmo remover esta conta?")) {
                             deleteMutation.mutate(account.id);
                           }
                         }}
@@ -194,15 +213,19 @@ export default function DomainAccounts() {
             setSelectedAccountId(null);
           }}
         />
+
         <CreateAccountModal
-          key={isCreateModalOpen ? "open" : "closed"}
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
-          onSubmit={(data) =>
-            toast.success("Conta criada com sucesso!") ||
-            queryClient.invalidateQueries({ queryKey: ["accounts"] })
-          }
-          isLoading={false}
+          isLoading={createAccountMutation.isPending}
+          onSubmit={(data) => {
+            console.log("Submetendo dados via Mutation:", data);
+            createAccountMutation.mutate({
+              ...data,
+              domainId: String(domainId), // Mantendo padrão de string do seu db.json
+              isBlocked: false,
+            });
+          }}
         />
       </main>
     </ProtectedRoute>

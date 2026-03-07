@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Domain } from '../types/domainTypes';
 import { User } from '../types/userTypes';
-import { Account } from "../types/accountTypes";
+import { Account, CreateAccountFormData } from "../types/accountTypes";
 
 // Instância base do Axios
 export const axiosInstance = axios.create({
@@ -14,14 +14,14 @@ export const axiosInstance = axios.create({
 
 
 // Parte de contas do domínio
-export const createDomainAccount = async (accountData: Omit<Account, 'id'>) => {
-  try {
-    const response = await axiosInstance.post<Account>('/accounts', accountData);
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao criar conta no domínio:", error);
-    throw error;
-  }
+export const createDomainAccount = async (data: CreateAccountFormData & { domainId: string; isBlocked: boolean }) => {
+  const payload = {
+    ...data,
+    id: String(Date.now()), 
+  };
+  
+  const response = await axiosInstance.post('/accounts', payload);
+  return response.data;
 };
 
 export const deleteDomainAccount = async (id: string) => {

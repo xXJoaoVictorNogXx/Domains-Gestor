@@ -175,6 +175,22 @@
       "storage": 5120,
       "isBlocked": true,
       "domainId": "6"
+    },
+    {
+      "id": "83ac",
+      "email": "joao@gmail.com",
+      "password": "123456",
+      "storage": 10,
+      "domainId": "1",
+      "isBlocked": false
+    },
+    {
+      "id": "1772853413892",
+      "email": "joaovictorfcantanheden@gmail.com",
+      "password": "123456",
+      "storage": 10,
+      "domainId": "3",
+      "isBlocked": false
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
