@@ -5,7 +5,7 @@ import { Account, CreateAccountFormData } from "../types/accountTypes";
 
 // Instância base do Axios
 export const axiosInstance = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001',
+  baseURL: "api",
         headers: {
         'Content-Type': 'application/json',
     },
