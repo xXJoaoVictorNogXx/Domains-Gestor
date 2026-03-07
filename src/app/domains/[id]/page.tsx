@@ -195,13 +195,14 @@ export default function DomainAccounts() {
           }}
         />
         <CreateAccountModal
+          key={isCreateModalOpen ? "open" : "closed"}
           isOpen={isCreateModalOpen}
-          isLoading={false}
           onClose={() => setIsCreateModalOpen(false)}
           onSubmit={(data) =>
             toast.success("Conta criada com sucesso!") ||
             queryClient.invalidateQueries({ queryKey: ["accounts"] })
           }
+          isLoading={false}
         />
       </main>
     </ProtectedRoute>
