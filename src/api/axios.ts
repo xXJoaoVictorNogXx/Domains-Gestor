@@ -48,35 +48,13 @@ export const updateDomainAccount = async ({ id, data }: { id: string; data: any 
 //Parte de acessos e criação de usuários do sistema em si
 export const loginUser = async (credentials: { email: User['email']; password: User['password'] }) => {
   try {
-    const usersResponse = await axiosInstance.get(`/users?email=${credentials.email}`);
-    const foundUsers = usersResponse.data;
-
-    if (foundUsers.length > 0) {
-      const userLogado = foundUsers[0];
-      return {
-        accessToken: `fake-jwt-token-${userLogado.id}`, 
-        user: userLogado
-      };
-    }
-
-    const adminResponse = await axiosInstance.get('/login');
-    const adminData = adminResponse.data;
-
-    if (
-      adminData?.user?.email === credentials.email && 
-      adminData?.user?.password === credentials.password
-    ) {
-      return {
-        accessToken: adminData.accessToken, 
-        user: adminData.user
-      };
-    }
-
-    throw new Error("Email ou senha inválidos");
+    const response = await axiosInstance.post('/login', credentials);
+    
+    return response.data; 
     
   } catch (error) {
     console.error("Erro no login:", error);
-    throw error;
+    throw new Error("Email ou senha inválidos");
   }
 };
 

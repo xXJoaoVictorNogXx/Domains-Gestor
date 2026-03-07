@@ -1,44 +1,49 @@
 import { NextResponse } from "next/server";
-import { db } from "@/src/lib/db";
+import { supabase } from "@/src/lib/supabase";
 
 export async function PATCH(
-  request: Request, 
-  { params }: { params: Promise<{ id: string }> } 
-) {
-  try {
-    const { id } = await params; 
-    const body = await request.json();
-    
-    const index = db.accounts.findIndex((a) => String(a.id) === String(id));
-
-    if (index === -1) {
-      return NextResponse.json({ error: "Conta não encontrada" }, { status: 404 });
-    }
-
-    db.accounts[index] = { ...db.accounts[index], ...body };
-
-    return NextResponse.json(db.accounts[index], { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: "Erro ao atualizar conta" }, { status: 400 });
-  }
-}
-
-export async function DELETE(
-  request: Request, 
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const index = db.accounts.findIndex((a) => String(a.id) === String(id));
+    const body = await request.json();
 
-    if (index === -1) {
-      return NextResponse.json({ error: "Conta não encontrada" }, { status: 404 });
+    const { data, error } = await supabase
+      .from('accounts')
+      .update(body) 
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: "Erro ao atualizar conta" }, { status: 400 });
     }
 
-    db.accounts.splice(index, 1);
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const { error } = await supabase
+      .from('accounts')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return NextResponse.json({ error: "Erro ao deletar conta" }, { status: 400 });
+    }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Erro ao deletar conta" }, { status: 400 });
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
   }
 }

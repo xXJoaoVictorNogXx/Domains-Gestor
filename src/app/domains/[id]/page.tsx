@@ -47,7 +47,6 @@ export default function DomainAccounts() {
       setIsCreateModalOpen(false);
     },
     onError: (error: Error) => {
-      console.error("Erro ao criar conta:", error.message);
       toast.error("Erro ao criar conta no servidor.");
     },
   });

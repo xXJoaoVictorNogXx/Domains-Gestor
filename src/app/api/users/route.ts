@@ -1,29 +1,48 @@
 import { NextResponse } from "next/server";
-import { db } from "@/src/lib/db";
+import { supabase } from "@/src/lib/supabase";
 
 export async function GET() {
-  return NextResponse.json(db.users);
+  const { data, error } = await supabase.from('users').select('*');
+  
+  if (error) {
+    return NextResponse.json({ error: "Erro ao buscar usuários" }, { status: 400 });
+  }
+  
+  return NextResponse.json(data);
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
-    // Verifica se o e-mail já existe
-    const userExists = db.users.some(u => u.email === body.email);
-    if (userExists) {
+
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', body.email)
+      .single();
+
+    if (existingUser) {
       return NextResponse.json({ error: "E-mail já cadastrado" }, { status: 400 });
     }
 
     const newUser = {
       ...body,
-      id: String(Date.now()),
+      id: String(Date.now()), 
     };
-    
-    db.users.push(newUser);
-    
-    return NextResponse.json(newUser, { status: 201 });
+
+    const { data, error } = await supabase
+      .from('users')
+      .insert([newUser])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Erro do Supabase:", error);
+      return NextResponse.json({ error: "Erro ao registrar usuário" }, { status: 400 });
+    }
+
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Erro ao registrar usuário" }, { status: 400 });
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 });
   }
 }

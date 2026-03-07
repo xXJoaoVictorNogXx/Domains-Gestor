@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
-import { db } from "@/src/lib/db";
+import { supabase } from "@/src/lib/supabase"; 
 
 export async function GET() {
-  return NextResponse.json(db.domains);
+  const { data, error } = await supabase
+    .from('domains')
+    .select('*');
+
+  if (error) {
+    return NextResponse.json({ error: "Erro ao procurar domínios" }, { status: 400 });
+  }
+
+  return NextResponse.json(data);
 }
