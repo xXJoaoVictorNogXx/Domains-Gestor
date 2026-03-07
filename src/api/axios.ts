@@ -5,8 +5,8 @@ import { Account } from "../types/accountTypes";
 
 // Instância base do Axios
 export const axiosInstance = axios.create({
-    baseURL: 'https://meu-backend-qle5.onrender.com', // em caso de teste local utilizar http://localhost:3001
-    headers: {
+        baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',    
+        headers: {
         'Content-Type': 'application/json',
     },
     timeout: 5000,
