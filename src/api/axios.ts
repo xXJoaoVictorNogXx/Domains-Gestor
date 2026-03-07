@@ -3,10 +3,22 @@ import { Domain } from '../types/domainTypes';
 import { User } from '../types/userTypes';
 import { Account, CreateAccountFormData } from "../types/accountTypes";
 
+
+// Verifica se está rodando no navegador (client) ou no servidor (SSR)
+const isClient = typeof window !== "undefined";
+
+// Na Vercel, você pode precisar configurar uma variável de ambiente no futuro,
+// mas essa lógica já resolve 99% dos casos no Next.js App Router.
+const baseURL = isClient 
+  ? '/api' 
+  : process.env.NEXT_PUBLIC_VERCEL_URL 
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api` 
+    : 'http://localhost:3000/api';
+
 // Instância base do Axios
 export const axiosInstance = axios.create({
-  baseURL: "api",
-        headers: {
+baseURL: baseURL,        
+headers: {
         'Content-Type': 'application/json',
     },
     timeout: 5000,
