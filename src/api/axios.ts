@@ -4,11 +4,11 @@ import { User } from '../types/userTypes';
 import { Account, CreateAccountFormData } from "../types/accountTypes";
 
 
-// Verifica se está rodando no navegador (client) ou no servidor (SSR)
+
 const isClient = typeof window !== "undefined";
 
-// Na Vercel, você pode precisar configurar uma variável de ambiente no futuro,
-// mas essa lógica já resolve 99% dos casos no Next.js App Router.
+
+
 const baseURL = isClient 
   ? '/api' 
   : process.env.NEXT_PUBLIC_VERCEL_URL 
