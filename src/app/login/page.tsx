@@ -141,7 +141,7 @@ export default function Login() {
 
           <div className="bg-muted relative hidden md:block">
             <Image
-              src="/vulkan.png"
+              src="/domainBG.png"
               alt="Image"
               fill
               className="object-cover"

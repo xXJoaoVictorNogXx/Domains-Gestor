@@ -10,7 +10,7 @@ export default function Home() {
       <div className="w-full max-w-3xl flex flex-col items-center text-center space-y-8">
         <div className="mb-4">
           <Image
-            src="/vulkan.png"
+            src="/domainBG.png"
             alt="Logo do Sistema"
             className=" w-auto object-contain"
             width={300}

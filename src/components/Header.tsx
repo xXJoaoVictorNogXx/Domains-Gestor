@@ -12,7 +12,7 @@ export default function Header() {
   return (
     <header className="flex items-center justify-between p-4">
       <Link href={"/domains"}>
-        <Image alt="Logo" src="/vulkanH.png" width={150} height={100} />
+        <Image alt="Logo" src="/domainBG.png" width={150} height={100} />
       </Link>
 
       <NavigationMenu className="space-x-4">
